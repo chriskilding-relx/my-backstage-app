@@ -63,15 +63,38 @@ techdocs:
     type: 'local' # Alternatives - 'googleGcs' or 'awsS3'. Read documentation for using alternatives.
 
 auth:
+  environment: development
+  session:
+    secret: ${AUTH_SESSION_SECRET}
   # see https://backstage.io/docs/auth/ to learn about auth providers
   providers:
     # See https://backstage.io/docs/auth/guest/provider
     guest: {}
+    keycloak:
+      development:
+        metadataUrl: https://<keycloak-server>/realms/<realm>/.well-known/openid-configuration
+        clientId: ${KEYCLOAK_CLIENT_ID}
+        clientSecret: ${KEYCLOAK_CLIENT_SECRET}
+        prompt: auto
+        tokenSignedResponseAlg: ES256
 
 scaffolder:
   # see https://backstage.io/docs/features/software-templates/configuration for software template options
 
 catalog:
+  providers:
+    keycloakOrg:
+      default:
+        baseUrl: https://<keycloak-server>
+        loginRealm: <realm>
+        realm: <realm>
+        clientId: ${KEYCLOAK_CLIENT_ID}
+        clientSecret: ${KEYCLOAK_CLIENT_SECRET}
+        schedule: # Optional (defaults to the configurations below if not provided); same options as in TaskScheduleDefinition
+          # supports cron, ISO duration, "human duration" as used in code
+          frequency: { minutes: 30 } # Customize this to fit your needs
+          # supports ISO duration, "human duration" as used in code
+          timeout: { minutes: 3 } # Customize this to fit your needs
   import:
     entityFilename: catalog-info.yaml
     pullRequestBranchName: backstage-integration
